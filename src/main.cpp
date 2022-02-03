@@ -4,13 +4,18 @@
 #include <signal.h>
 
 #include <iostream>
+
 #include "INIReader.h"
+
+#include "yocto_api.h"
+#include "yocto_pwminput.h"
 
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
 const char* DEFAULT_LOG_FILE = "workdata.log";
 const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
+
 
 void
 system_sig_handler(int s) {
