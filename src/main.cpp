@@ -9,7 +9,7 @@
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
 const char* DEFAULT_LOG_FILE = "workdata.log";
-const char* DEFAULT_GX808_SERIAL_PORT = "COM1";
+const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
 
 void
@@ -31,7 +31,7 @@ main(int argc, char *argv[]) {
     sprintf(cfgFile, "%s",DEFAULT_CONFIG_FILE);
     sprintf(logFile, "%s",DEFAULT_LOG_FILE);
 
-    sprintf(comPort, "%s", DEFAULT_GX808_SERIAL_PORT);
+    sprintf(comPort, "%s", DEFAULT_ML808GX_SERIAL_PORT);
     sprintf(usbPort, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
     
     // try to load config file to overwrite default value
@@ -39,8 +39,8 @@ main(int argc, char *argv[]) {
     if(reader->ParseError() == 0) {
         sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
 
-        sprintf(comPort, "%s", reader->Get("GX808", "PORT", DEFAULT_GX808_SERIAL_PORT).c_str());
-        sprintf(usbPort, "%s", reader->Get("SIG_READER", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+        sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
+        sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
     }
     delete reader;
 
@@ -52,8 +52,8 @@ main(int argc, char *argv[]) {
                 if(reader->ParseError() == 0) {
                     sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
 
-                    sprintf(comPort, "%s", reader->Get("GX808", "PORT", DEFAULT_GX808_SERIAL_PORT).c_str());
-                    sprintf(usbPort, "%s", reader->Get("SIG_READER", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+                    sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
+                    sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
                 } else {
                     fprintf(stderr, "Config file error, check file existence or format\n");
                     exit(EXIT_FAILURE);
@@ -87,7 +87,7 @@ main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "GX808 control port: %s\n"
+    fprintf(stderr, "ML808GX control port: %s\n"
                     "Microplotter Signal detector port: %s\n\n", comPort, usbPort);
     
     // TODO: Check ports, validate equipments
