@@ -1,0 +1,3 @@
+[submodule "extlib/yoctolib_cpp"]
+	path = extlib/yoctolib_cpp
+	url = git@github.com:yoctopuce/yoctolib_cpp.git
