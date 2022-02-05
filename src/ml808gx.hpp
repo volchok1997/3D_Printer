@@ -1,3 +1,5 @@
+#ifndef __ML808GX_HPP__
+#define __ML808GX_HPP__
 
 class ML808GX {
 private:
@@ -32,3 +34,5 @@ public:
     int StartDispense();
     int StopDispense();
 };
+
+#endif
