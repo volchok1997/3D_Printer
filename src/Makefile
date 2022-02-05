@@ -3,13 +3,16 @@ YOCTO_HOME := ../extlib/yoctolib_cpp
 YOCTO_API_SRC := ${YOCTO_HOME}/Sources
 
 UNAME_S := $(shell uname -s)
+ARCH  := $(shell uname -m| sed -e s/i.86/i386/ -e s/arm.*/arm/)
 
 ifeq ($(UNAME_S),Linux)
 	CC := g++
+ifeq (${ARCH}, x86_64)
 	YOCTO_LIB_PATH = ${YOCTO_HOME}/Binaries/linux/64bits
+else ifeq (${ARCH}, aarch64)
+	YOCTO_LIB_PATH = ${YOCTO_HOME}/Binaries/linux/aarch64
 endif
-
-ifeq ($(UNAME_S),Darwin)
+else ifeq ($(UNAME_S),Darwin)
 	CC := cc
 endif
 
