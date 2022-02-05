@@ -1,0 +1,8 @@
+# ignore all objs
+*.o
+
+# ignore vi swp
+*.swp
+
+# target
+dispenserController
