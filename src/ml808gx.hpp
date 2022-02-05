@@ -25,14 +25,16 @@ private:
     int CmdInit();
     int CmdEndWithData(char buf[], int size);
     int CmdEnd();
-    int ToggleDispense();
+    
 public:
     ML808GX();
 
     int ConnectSerial(const char* dev, int baudrate);
     int VerifyDispenser();
+    int GetDispenserStatus();
     int StartDispense();
     int StopDispense();
+    int ToggleDispense();
 };
 
 #endif

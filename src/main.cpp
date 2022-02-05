@@ -4,6 +4,8 @@
 #include <signal.h>
 
 #include <iostream>
+#include <chrono>
+#include <ctime> 
 
 #include "INIReader.hpp"
 
@@ -20,6 +22,25 @@ const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
 const int DEFAULT_COM_BAUDRATE = 115200;
 
+
+static ML808GX dispenser;
+Yocto_PWM pwm;
+
+static void pwmChangeCallback(YPwmInput *fct, const string &value) {
+    int err;
+    dispenser.ToggleDispense();
+    auto n = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(n);
+
+    if(dispenser.GetDispenserStatus()==0) {
+        err = dispenser.StartDispense();
+        std::cerr << std::ctime(&t) << "Start Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
+    } else {
+        err = dispenser.StopDispense();
+        std::cerr << std::ctime(&t) << "Stop Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
+    }
+    
+}
 
 void
 system_sig_handler(int s) {
@@ -105,7 +126,6 @@ main(int argc, char *argv[]) {
     // TODO: Check ports, validate equipments
 
 // test dispenser
-    ML808GX dispenser;
     dispenser.ConnectSerial(comPort, baudrate);
     dispenser.VerifyDispenser();
     dispenser.StartDispense();
@@ -122,5 +142,11 @@ main(int argc, char *argv[]) {
 
     }
 
+// Don't touch this 
+    //pwm.Detect();
+    //pwm.EnablePWMDetection(pwmChangeCallback);
+    //pwm.EnterEventMode();
+
     exit(EXIT_SUCCESS);
 }
+

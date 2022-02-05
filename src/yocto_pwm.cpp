@@ -5,12 +5,9 @@
 #include <chrono>
 #include <ctime>   
 
-#include "yocto_api.h"
-#include "yocto_pwminput.h"
-
 #include "yocto_pwm.hpp"
 
-static void pwmChangeCallback(YPwmInput *fct, const string &value)
+static void pwmChangeCallbackTest(YPwmInput *fct, const string &value)
 {
     auto n = std::chrono::system_clock::now();
     std::time_t t = std::chrono::system_clock::to_time_t(n);
@@ -67,8 +64,8 @@ int Yocto_PWM::Test() {
     return 0;
 }
 
-void Yocto_PWM::EnablePWMDetection() {
-    pwm1->registerValueCallback(pwmChangeCallback);
+void Yocto_PWM::EnablePWMDetection(YPwmInputValueCallback callback) {
+    pwm1->registerValueCallback(callback);
 }
 
 void Yocto_PWM::EnterEventMode() {
@@ -85,7 +82,7 @@ void Yocto_PWM::EnterEventMode() {
 void yoctoTest() {
     Yocto_PWM pwm;
     pwm.Detect();
-    pwm.EnablePWMDetection();
+    pwm.EnablePWMDetection(pwmChangeCallbackTest);
     pwm.EnterEventMode();
 }
 

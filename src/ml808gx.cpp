@@ -198,3 +198,7 @@ int ML808GX::StopDispense() {
     
     return err;
 }
+
+int ML808GX::GetDispenserStatus() {
+    return dispenser_status;
+}

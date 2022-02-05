@@ -1,6 +1,9 @@
 #ifndef __YOCTO_PWM_HPP__
 #define __YOCTO_PWM_HPP__
 
+#include "yocto_api.h"
+#include "yocto_pwminput.h"
+
 class Yocto_PWM {
 private:
     YPwmInput   *pwm;
@@ -11,7 +14,7 @@ public:
     Yocto_PWM();
     int Detect();
     int Test();
-    void EnablePWMDetection();
+    void EnablePWMDetection(YPwmInputValueCallback callback);
     void EnterEventMode();
 };
 
