@@ -5,16 +5,19 @@
 
 #include <iostream>
 
-#include "INIReader.h"
+#include "INIReader.hpp"
 
 #include "yocto_api.h"
 #include "yocto_pwminput.h"
+
+#include "ml808gx.hpp"
 
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
 const char* DEFAULT_LOG_FILE = "workdata.log";
 const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
+const int DEFAULT_COM_BAUDRATE = 115200;
 
 
 void
@@ -30,6 +33,7 @@ main(int argc, char *argv[]) {
     char cfgFile[256];
 
     char comPort[256];
+    int baudrate;
     char usbPort[256];
 
     // default setup
@@ -38,6 +42,7 @@ main(int argc, char *argv[]) {
 
     sprintf(comPort, "%s", DEFAULT_ML808GX_SERIAL_PORT);
     sprintf(usbPort, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
+    baudrate = DEFAULT_COM_BAUDRATE;
     
     // try to load config file to overwrite default value
     INIReader* reader = new INIReader(cfgFile);
@@ -45,6 +50,7 @@ main(int argc, char *argv[]) {
         sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
 
         sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
+        baudrate = reader->GetInteger("ML808GX", "BAUDRATE", DEFAULT_COM_BAUDRATE);
         sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
     }
     delete reader;
@@ -96,6 +102,14 @@ main(int argc, char *argv[]) {
                     "Microplotter Signal detector port: %s\n\n", comPort, usbPort);
     
     // TODO: Check ports, validate equipments
+
+    ML808GX dispenser;
+    dispenser.ConnectSerial(comPort, baudrate);
+    dispenser.VerifyDispenser();
+    dispenser.StartDispense();
+    sleep(10);
+    dispenser.StopDispense();
+
 
 
     signal(SIGINT, system_sig_handler);
