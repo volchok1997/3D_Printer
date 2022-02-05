@@ -11,6 +11,7 @@
 #include "yocto_pwminput.h"
 
 #include "ml808gx.hpp"
+#include "yocto_pwm.hpp"
 
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
@@ -103,6 +104,7 @@ main(int argc, char *argv[]) {
     
     // TODO: Check ports, validate equipments
 
+// test dispenser
     ML808GX dispenser;
     dispenser.ConnectSerial(comPort, baudrate);
     dispenser.VerifyDispenser();
@@ -110,7 +112,8 @@ main(int argc, char *argv[]) {
     sleep(10);
     dispenser.StopDispense();
 
-
+// test pwm
+//    yoctoTest();
 
     signal(SIGINT, system_sig_handler);
 
