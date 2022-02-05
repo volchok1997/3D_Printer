@@ -156,6 +156,7 @@ int main(int argc, char *argv[]) {
     //write
     //dispence \x0204DI__CF\x03
     //ROM version \x0205RM___9C\x03
+    //underscore "_" may have to be changed to \x20
     std::cout << "Writing \"205RM   9C3\" to see the version" << endl;
     unsigned char enq[1] = { 0x05 }; //ENQ command to initalize communication
     unsigned char cmd[16] = " 05RM   9C ";
@@ -184,6 +185,7 @@ int main(int argc, char *argv[]) {
     char response[1024];
     memset(response, '\0', sizeof response);
 
+
     //lseek(USB, 0, SEEK_SET);
     do {
         n = read( USB, &buf, 1 );
@@ -192,6 +194,7 @@ int main(int argc, char *argv[]) {
 	printf("%s\n", response);
         spot += n;
     } while(buf != 0x06);
+
 
     if (n < 0) {
         std::cout << "Error reading: " << strerror(errno) << std::endl;

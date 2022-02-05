@@ -9,7 +9,10 @@
 #include <termios.h>
 #include <unistd.h>
 
+<<<<<<< HEAD
 #include <iomanip>
+=======
+>>>>>>> origin
 #include <iostream>
 using namespace std;
 
@@ -25,7 +28,11 @@ const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
 
 const char* STX = "\x02";
+<<<<<<< HEAD
 const char* ETX = "\x03";
+=======
+const char*	ETX = "\x03";
+>>>>>>> origin
 
 void system_sig_handler(int s) {
     exit(s);
@@ -108,7 +115,11 @@ int main(int argc, char *argv[]) {
     // TODO: Check ports, validate equipments
     std::cout << "Opening USB port." << std::endl;
     /* Open File Descriptor */
+<<<<<<< HEAD
     int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY);
+=======
+    int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY );
+>>>>>>> origin
     
     //Open USB error handiling
     if (USB < 0) {
@@ -128,11 +139,19 @@ int main(int argc, char *argv[]) {
 
     /* Save old tty parameters */
     tty_old = tty;
+<<<<<<< HEAD
 
     /* Set Baud Rate */
     cfsetospeed (&tty, (speed_t)B19200);
     cfsetispeed (&tty, (speed_t)B19200);
 
+=======
+
+    /* Set Baud Rate */
+    cfsetospeed (&tty, (speed_t)B19200);
+    cfsetispeed (&tty, (speed_t)B19200);
+
+>>>>>>> origin
     /* Setting other Port Stuff */
     tty.c_cflag     &=  ~PARENB;            // Make 8n1
     tty.c_cflag     &=  ~CSTOPB;
@@ -156,6 +175,8 @@ int main(int argc, char *argv[]) {
     //write
     //dispence \x0204DI__CF\x03
     //ROM version \x0205RM___9C\x03
+    //underscore "_" may have to be changed to \x20
+<<<<<<< HEAD
     std::cout << "Writing \"205RM   9C3\" to see the version" << endl;
     unsigned char enq[1] = { 0x05 }; //ENQ command to initalize communication
     unsigned char cmd[16] = " 05RM   9C ";
@@ -178,11 +199,27 @@ int main(int argc, char *argv[]) {
     //read
     int n = 0;
     spot = 0;
+=======
+    std::cout << "Writing \\x0204DI__CF\\x03." << std::endl;
+    unsigned char cmd[] = "\\x0204DI__CF\\x03";
+    int n_written = 0,
+        spot = 0;
+
+    do {
+        n_written = write( USB, &cmd[spot], 1 );
+        spot += n_written;
+    } while (cmd[spot-1] != '\r' && n_written > 0);
+
+    //read
+    int n = 0;
+>>>>>>> origin
     char buf = '\0';
 
     /* Whole response*/
     char response[1024];
     memset(response, '\0', sizeof response);
+
+<<<<<<< HEAD
 
     //lseek(USB, 0, SEEK_SET);
     do {
@@ -193,6 +230,14 @@ int main(int argc, char *argv[]) {
         spot += n;
     } while(buf != 0x06);
 
+=======
+    do {
+        n = read( USB, &buf, 1 );
+        sprintf( &response[spot], "%c", buf );
+        spot += n;
+    } while( buf != '\r' && n > 0);
+>>>>>>> origin
+
     if (n < 0) {
         std::cout << "Error reading: " << strerror(errno) << std::endl;
     }
@@ -202,6 +247,7 @@ int main(int argc, char *argv[]) {
     else {
         std::cout << "Response: " << response << std::endl;
     }
+<<<<<<< HEAD
 
     cout << "Received ACK signal" << endl;
 
@@ -225,6 +271,8 @@ int main(int argc, char *argv[]) {
     } while(buf != 0x03);
 
     cout << "Responce received." << endl;
+=======
+>>>>>>> origin
 
     signal(SIGINT, system_sig_handler);
 
