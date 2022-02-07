@@ -9,49 +9,30 @@
 #include <termios.h>
 #include <unistd.h>
 
+<<<<<<< HEAD
 #include <iomanip>
+=======
+>>>>>>> origin
 #include <iostream>
+using namespace std;
 
-#include <chrono>
-#include <ctime> 
-
-
-#include "INIReader.hpp"
+#include "INIReader.h"
 
 //#include "yocto_api.h"
 //#include "yocto_pwminput.h"
-
-#include "ml808gx.hpp"
-#include "yocto_pwm.hpp"
 
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
 const char* DEFAULT_LOG_FILE = "workdata.log";
 const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
 const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
-const int DEFAULT_COM_BAUDRATE = 115200;
 
-
-static ML808GX dispenser;
-Yocto_PWM pwm;
-
-
-static void pwmChangeCallback(YPwmInput *fct, const string &value) {
-    int err;
-    dispenser.ToggleDispense();
-    auto n = std::chrono::system_clock::now();
-    std::time_t t = std::chrono::system_clock::to_time_t(n);
-
-    if(dispenser.GetDispenserStatus()==0) {
-        err = dispenser.StartDispense();
-        std::cerr << std::ctime(&t) << "Start Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
-    } else {
-        err = dispenser.StopDispense();
-        std::cerr << std::ctime(&t) << "Stop Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
-    }
-    
-}
-
+const char* STX = "\x02";
+<<<<<<< HEAD
+const char* ETX = "\x03";
+=======
+const char*	ETX = "\x03";
+>>>>>>> origin
 
 void system_sig_handler(int s) {
     exit(s);
@@ -66,7 +47,6 @@ int main(int argc, char *argv[]) {
     char cfgFile[256];
 
     char comPort[256];
-    int baudrate;
     char usbPort[256];
 
     // default setup
@@ -75,7 +55,6 @@ int main(int argc, char *argv[]) {
 
     sprintf(comPort, "%s", DEFAULT_ML808GX_SERIAL_PORT);
     sprintf(usbPort, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
-    baudrate = DEFAULT_COM_BAUDRATE;
     
     // try to load config file to overwrite default value
     INIReader* reader = new INIReader(cfgFile);
@@ -83,7 +62,6 @@ int main(int argc, char *argv[]) {
         sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
 
         sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
-        baudrate = reader->GetInteger("ML808GX", "BAUDRATE", DEFAULT_COM_BAUDRATE);
         sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
     }
     delete reader;
@@ -137,7 +115,11 @@ int main(int argc, char *argv[]) {
     // TODO: Check ports, validate equipments
     std::cout << "Opening USB port." << std::endl;
     /* Open File Descriptor */
+<<<<<<< HEAD
     int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY);
+=======
+    int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY );
+>>>>>>> origin
     
     //Open USB error handiling
     if (USB < 0) {
@@ -157,22 +139,140 @@ int main(int argc, char *argv[]) {
 
     /* Save old tty parameters */
     tty_old = tty;
+<<<<<<< HEAD
 
     /* Set Baud Rate */
     cfsetospeed (&tty, (speed_t)B19200);
     cfsetispeed (&tty, (speed_t)B19200);
 
+=======
 
-// test dispenser
-    dispenser.ConnectSerial(comPort, baudrate);
-    dispenser.VerifyDispenser();
-    dispenser.StartDispense();
-    sleep(10);
-    dispenser.StopDispense();
+    /* Set Baud Rate */
+    cfsetospeed (&tty, (speed_t)B19200);
+    cfsetispeed (&tty, (speed_t)B19200);
 
-// test pwm
-//    yoctoTest();
+>>>>>>> origin
+    /* Setting other Port Stuff */
+    tty.c_cflag     &=  ~PARENB;            // Make 8n1
+    tty.c_cflag     &=  ~CSTOPB;
+    tty.c_cflag     &=  ~CSIZE;
+    tty.c_cflag     |=  CS8;
 
+    tty.c_cflag     &=  ~CRTSCTS;           // no flow control
+    tty.c_cc[VMIN]   =  1;                  // read doesn't block
+    tty.c_cc[VTIME]  =  5;                  // 0.5 seconds read timeout
+    tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+
+    /* Make raw */
+    cfmakeraw(&tty);
+
+    /* Flush Port, then applies attributes */
+    tcflush( USB, TCIFLUSH );
+    if ( tcsetattr ( USB, TCSANOW, &tty ) != 0) {
+    std::cout << "Error " << errno << " from tcsetattr" << std::endl;
+    }
+
+    //write
+    //dispence \x0204DI__CF\x03
+    //ROM version \x0205RM___9C\x03
+    //underscore "_" may have to be changed to \x20
+<<<<<<< HEAD
+    std::cout << "Writing \"205RM   9C3\" to see the version" << endl;
+    unsigned char enq[1] = { 0x05 }; //ENQ command to initalize communication
+    unsigned char cmd[16] = " 05RM   9C ";
+    cmd[0]=0x02;
+    cmd[9]=0x03;
+    int n_written = 0,
+        spot = 0;
+
+    do {	
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << (0xFF & enq[spot]);    
+	cout << " " << enq[spot] << endl;
+	n_written = write( USB, &enq[spot], 1 );
+        spot += n_written;
+    } while (enq[spot-1] != 0x05 && n_written > 0);
+
+    cout << endl;
+
+    cout << "Sent " << dec << spot << " characters." << endl;
+
+    //read
+    int n = 0;
+    spot = 0;
+=======
+    std::cout << "Writing \\x0204DI__CF\\x03." << std::endl;
+    unsigned char cmd[] = "\\x0204DI__CF\\x03";
+    int n_written = 0,
+        spot = 0;
+
+    do {
+        n_written = write( USB, &cmd[spot], 1 );
+        spot += n_written;
+    } while (cmd[spot-1] != '\r' && n_written > 0);
+
+    //read
+    int n = 0;
+>>>>>>> origin
+    char buf = '\0';
+
+    /* Whole response*/
+    char response[1024];
+    memset(response, '\0', sizeof response);
+
+<<<<<<< HEAD
+
+    //lseek(USB, 0, SEEK_SET);
+    do {
+        n = read( USB, &buf, 1 );
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: " << (0xFF & buf) << "*" << endl; 
+	sprintf( &response[spot], "%c", buf );
+	printf("%s\n", response);
+        spot += n;
+    } while(buf != 0x06);
+
+=======
+    do {
+        n = read( USB, &buf, 1 );
+        sprintf( &response[spot], "%c", buf );
+        spot += n;
+    } while( buf != '\r' && n > 0);
+>>>>>>> origin
+
+    if (n < 0) {
+        std::cout << "Error reading: " << strerror(errno) << std::endl;
+    }
+    else if (n == 0) {
+        std::cout << "Read nothing!" << std::endl;
+    }
+    else {
+        std::cout << "Response: " << response << std::endl;
+    }
+<<<<<<< HEAD
+
+    cout << "Received ACK signal" << endl;
+
+    spot = 0;
+    cout << "Writing the command." << endl;
+    cout << "Hex Char" << endl;
+    do {
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << (0xFF & cmd[spot]);
+	cout << "  " << cmd[spot] << endl;
+	n_written = write( USB, &cmd[spot], 1 );
+	spot += n_written;
+    } while (cmd[spot-1] != 0x03 && n_written > 0);
+
+    spot = 0;
+    do {
+	n = read( USB, &buf, 1 );
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: " << (0xFF & buf) << "*" << endl;
+	sprintf( &response[spot], "%c", buf );
+	printf("%s\n", response);
+	spot += n;
+    } while(buf != 0x03);
+
+    cout << "Responce received." << endl;
+=======
+>>>>>>> origin
 
     signal(SIGINT, system_sig_handler);
 
@@ -180,11 +280,6 @@ int main(int argc, char *argv[]) {
     //while(1) {
 
     //}
-
-// Don't touch this 
-    //pwm.Detect();
-    //pwm.EnablePWMDetection(pwmChangeCallback);
-    //pwm.EnterEventMode();
 
     exit(EXIT_SUCCESS);
 }
