@@ -43,7 +43,7 @@ int ML808GX::CmdInit() {
     // FIXME: test the delay is OK
     c = 0;
     buf[0] = 0;
-    while(n = read(com_fd, buf, 1)) {
+    while(n = read(com_fd, buf, 1) ==0) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
@@ -64,7 +64,7 @@ int ML808GX::CmdEndWithData(char data[], int size) {
     int n;
     int c=0;
 
-    while(n = read(com_fd, buf, 64)) {
+    while(n = read(com_fd, buf, 64) ==0) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
@@ -77,7 +77,7 @@ int ML808GX::CmdEndWithData(char data[], int size) {
         write(com_fd, ACK.c_str(), ACK.size());
         c=0;
         // read message
-        while(n = read(com_fd, data, size)) {
+        while(n = read(com_fd, data, size) ==0) {
             usleep (COMM_DELAY); 
             c+= COMM_DELAY;
             if(c>MSG_WAIT_US)
@@ -102,7 +102,7 @@ int ML808GX::CmdEnd() {
     int n;
     int c=0;
 
-    while(n = read(com_fd, buf, 64)) {
+    while(n = read(com_fd, buf, 64) ==0) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
