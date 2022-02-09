@@ -67,14 +67,14 @@ int main(int argc, char *argv[]) {
 
     char comPort[256];
     int baudrate;
-    char usbPort[256];
+    char usbPwmDevice[256];
 
     // default setup
     sprintf(cfgFile, "%s",DEFAULT_CONFIG_FILE);
     sprintf(logFile, "%s",DEFAULT_LOG_FILE);
 
     sprintf(comPort, "%s", DEFAULT_ML808GX_SERIAL_PORT);
-    sprintf(usbPort, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
+    sprintf(usbPwmDevice, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
     baudrate = DEFAULT_COM_BAUDRATE;
     
     // try to load config file to overwrite default value
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 
         sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
         baudrate = reader->GetInteger("ML808GX", "BAUDRATE", DEFAULT_COM_BAUDRATE);
-        sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+        sprintf(usbPwmDevice, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "DEVICE", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
     }
     delete reader;
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
                     sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
 
                     sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
-                    sprintf(usbPort, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+                    sprintf(usbPwmDevice, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
                 } else {
                     fprintf(stderr, "Config file error, check file existence or format\n");
                     exit(EXIT_FAILURE);
@@ -119,10 +119,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 'u':
                 if(optarg == NULL) {
-                    fprintf(stderr, "USB port format error.\n");
+                    fprintf(stderr, "USB/Yocto-PWM device format error.\n");
                     exit(EXIT_FAILURE);
                 }
-                sprintf(usbPort, "%s", optarg);
+                sprintf(usbPwmDevice, "%s", optarg);
                 break;
             case 'r':
                 if(optarg == NULL) {
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "ML808GX control port: %s, rate: %d\n"
-                    "Microplotter Signal detector port: %s\n\n", comPort, baudrate, usbPort);
+                    "Microplotter Signal detector port: %s\n\n", comPort, baudrate, usbPwmDevice);
     
     // TODO: Check ports, validate equipments
     std::cout << "Opening USB port." << std::endl;
