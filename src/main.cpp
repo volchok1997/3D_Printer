@@ -159,9 +159,11 @@ int main(int argc, char *argv[]) {
     //underscore "_" may have to be changed to \x20
     std::cout << "Writing \"205RM   9C3\" to see the version" << endl;
     unsigned char enq[1] = { 0x05 }; //ENQ command to initalize communication
+    unsigned char ack[1] = { 0x06 }; //ENQ command to initalize communication
+    unsigned char eot[1] = { 0x04 }; //ENQ command to initalize communication
     unsigned char cmd[16] = " 05RM   9C ";
     cmd[0]=0x02;
-    cmd[9]=0x03;
+    cmd[10]=0x03;
     int n_written = 0,
         spot = 0;
 
@@ -189,7 +191,7 @@ int main(int argc, char *argv[]) {
     //lseek(USB, 0, SEEK_SET);
     do {
         n = read( USB, &buf, 1 );
-	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: " << (0xFF & buf) << "*" << endl; 
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: 0x" << (0xFF & buf) << endl; 
 	sprintf( &response[spot], "%c", buf );
 	printf("%s\n", response);
         spot += n;
@@ -221,14 +223,48 @@ int main(int argc, char *argv[]) {
     spot = 0;
     do {
 	n = read( USB, &buf, 1 );
-	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: " << (0xFF & buf) << "*" << endl;
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: 0x" << (0xFF & buf) << endl;
 	sprintf( &response[spot], "%c", buf );
-	printf("%s\n", response);
 	spot += n;
     } while(buf != 0x03);
 
+    printf("%s\n", response);
     cout << "Responce received." << endl;
 
+    
+    spot = 0;
+    cout << "Writing the ACK to the dispencer." << endl;
+    cout << "Hex Char" << endl;
+    do {
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << (0xFF & ack[spot]);
+	cout << "  " << ack[spot] << endl;
+	n_written = write( USB, &ack[spot], 1 );
+	spot += n_written;
+    } while (ack[spot-1] != 0x06 && n_written > 0);
+
+    spot = 0;
+    do {
+	n = read( USB, &buf, 1 );
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << "Read char: 0x" << (0xFF & buf) << endl;
+	sprintf( &response[spot], "%c", buf );
+	spot += n;
+    } while(buf != 0x03);
+
+    printf("%s\n", response);
+    cout << "Responce received." << endl;
+    
+    
+    spot = 0;
+    cout << "Writing the EOT to the dispencer." << endl;
+    cout << "Hex Char" << endl;
+    do {
+	cout << std::setfill('0') << std::setw(2) << uppercase << hex << (0xFF & eot[spot]);
+	cout << "  " << eot[spot] << endl;
+	n_written = write( USB, &eot[spot], 1 );
+	spot += n_written;
+    } while (eot[spot-1] != 0x04 && n_written > 0);
+    
+    
     signal(SIGINT, system_sig_handler);
 
     // TODO: tracking signal changes and control the dispenser
