@@ -7,7 +7,7 @@ private:
     int com_fd;
     const int COMM_DELAY=10;
     const int EOT_WAIT_US = 1000;
-    const int ACK_WAIT_US = 1000;
+    const int ACK_WAIT_US = 10000;
     const int MSG_WAIT_US = 1000;
     // Pre-defined communication command
     const std::string STX = "\x02";
