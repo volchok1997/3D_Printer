@@ -34,7 +34,7 @@ int ML808GX::ConnectSerial(const char* dev, int baudrate) {
 }
 
 int ML808GX::CmdInit() {
-    char buf [8];
+    char buf [16];
     int n;
     int c;
     // send ENQ
@@ -43,7 +43,7 @@ int ML808GX::CmdInit() {
     // FIXME: test the delay is OK
     c = 0;
     buf[0] = 0;
-    while(n = read(com_fd, buf, 1)) {
+    while(n += read(com_fd, buf+n, 8) == 0) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
@@ -63,26 +63,38 @@ int ML808GX::CmdEndWithData(char data[], int size) {
     char buf[64] = {};
     int n;
     int c=0;
-
-    while(n = read(com_fd, buf, 64)) {
+    int data_size = 3;
+    while(n += read(com_fd, buf+n, 16) <8) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
             break;
     }
-
+    buf[n] = 0;
     std::string reply(buf);
     if(reply == A0) {
         // send ACK
         write(com_fd, ACK.c_str(), ACK.size());
         c=0;
         // read message
-        while(n = read(com_fd, data, size)) {
+        while(n += read(com_fd, data+n, size) <size) {
             usleep (COMM_DELAY); 
             c+= COMM_DELAY;
             if(c>MSG_WAIT_US)
                 break;
+            if(n>=3) {
+                if(data[1]<='9')
+                    size = (data[1]-'0')<<4;
+                else
+                    size = (data[1]-'A'+10)<<4;
+                if(data[2]<='9')
+                    size += (data[2]-'0');
+                else
+                    size += (data[2]-'A'+10);
+                size += 3+3;
+            }
         }
+        data[n]=0;
         // send EOT
         write(com_fd, EOT.c_str(), EOT.size());
         return n;
@@ -102,7 +114,7 @@ int ML808GX::CmdEnd() {
     int n;
     int c=0;
 
-    while(n = read(com_fd, buf, 64)) {
+    while(n = read(com_fd, buf, 64) ==0) {
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
