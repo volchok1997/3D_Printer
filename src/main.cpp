@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     }
     delete reader;
 
-    while((opt = getopt(argc, argv, "c:p:u:l:")) != -1) {
+    while((opt = getopt(argc, argv, "c:p:u:l:r:")) != -1) {
         switch (opt) {
             case 'c':
                 sprintf(cfgFile, "%s", optarg);
@@ -124,6 +124,13 @@ int main(int argc, char *argv[]) {
                 }
                 sprintf(usbPort, "%s", optarg);
                 break;
+            case 'r':
+                if(optarg == NULL) {
+                    fprintf(stderr, "COM rate error.\n");
+                    exit(EXIT_FAILURE);
+                }
+                baudrate =atoi(optarg);
+                break;
             default: /* '?' */
                 fprintf(stderr, "Usage: %s [-c CONFIG_FILE] [-p COM_PORT] [-u USB_PORT] [-l LOG_FILE]\n",
                             argv[0]);
@@ -131,8 +138,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "ML808GX control port: %s\n"
-                    "Microplotter Signal detector port: %s\n\n", comPort, usbPort);
+    fprintf(stderr, "ML808GX control port: %s, rate: %d\n"
+                    "Microplotter Signal detector port: %s\n\n", comPort, baudrate, usbPort);
     
     // TODO: Check ports, validate equipments
     std::cout << "Opening USB port." << std::endl;
