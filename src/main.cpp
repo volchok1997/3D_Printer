@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
     
     //Open USB error handiling
     if (USB < 0) {
-        cout << "Error while opening device... " << "errno = " << errno << endl;
+	std::cout << "Error while opening device... " << "errno = " << errno << std::endl;
         perror("Something went wrong with open()");
         exit(1);
     }
