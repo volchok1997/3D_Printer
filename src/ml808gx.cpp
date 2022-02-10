@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include "serial.h"
 
+#include <iostream>
 #include <string>
 //using std::string;
 
@@ -19,7 +20,7 @@ ML808GX::ML808GX() {
 
 int ML808GX::ConnectSerial(const char* dev, int baudrate) {
     int err;
-    com_fd = open (dev, O_RDWR | O_NOCTTY | O_SYNC);
+    com_fd = open(dev, O_RDWR | O_NOCTTY);
     if(com_fd<0) {
         fprintf (stderr, "error %d opening %s: %s", errno, dev, strerror (errno));
         return com_fd;
@@ -37,14 +38,15 @@ int ML808GX::CmdInit() {
     char buf [16];
     int n;
     int c;
+    int n_written = 0;
     // send ENQ
-    write(com_fd, ENQ.c_str(), ENQ.size());
+    n_written = write(com_fd, ENQ.c_str(), ENQ.size());
     // wait ACK
     // FIXME: test the delay is OK
     c = 0;
     buf[0] = 0;
-    while(n += read(com_fd, buf+n, 8) == 0) {
-        usleep (COMM_DELAY); 
+    while(n = read(com_fd, buf, 8) == 0) {
+	usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
             break;
@@ -61,23 +63,26 @@ int ML808GX::CmdInit() {
 
 int ML808GX::CmdEndWithData(char data[], int size) {
     char buf[64] = {};
-    int n;
+    int n=0;
     int c=0;
     int data_size = 3;
-    while(n += read(com_fd, buf+n, 16) <8) {
+    while((n += read(com_fd, buf+n, 64-n)) < 8) {
         usleep (COMM_DELAY); 
+	std::cout << "n = " << n << std::hex << ", read char: 0x" << (0xFF & buf[0]) << std::endl;
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
             break;
     }
+    std::cout<<"DEBUG:"<<buf<<std::endl;
     buf[n] = 0;
+    n=0;
     std::string reply(buf);
     if(reply == A0) {
         // send ACK
         write(com_fd, ACK.c_str(), ACK.size());
         c=0;
         // read message
-        while(n += read(com_fd, data+n, size) <size) {
+        while((n += read(com_fd, data+n, size)) <size) {
             usleep (COMM_DELAY); 
             c+= COMM_DELAY;
             if(c>MSG_WAIT_US)
@@ -110,17 +115,18 @@ int ML808GX::CmdEndWithData(char data[], int size) {
 }
 
 int ML808GX::CmdEnd() {
-    char buf[64] = {};
-    int n;
+    char buf[16] = {};
+    int n=0;
     int c=0;
 
-    while(n = read(com_fd, buf, 64) ==0) {
+    while((n += read(com_fd, buf+n, 16-n)) <8) {
+	std::cout << "n = " << n << std::hex << ", read char: 0x" << (0xFF & buf[0]) << std::endl;
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
             break;
     }
-
+    buf[n]=0;
     std::string reply(buf);
     if(reply == A0) {
         // send EOT
