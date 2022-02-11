@@ -19,5 +19,6 @@ public:
 };
 
 void yoctoTest(string dev);
+void YoctoFreeAll();
 
 #endif

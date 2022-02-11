@@ -54,6 +54,7 @@ static void pwmChangeCallback(YPwmInput *fct, const string &value) {
 
 
 void system_sig_handler(int s) {
+    YoctoFreeAll();
     exit(s);
 }
 

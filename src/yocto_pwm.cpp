@@ -7,6 +7,10 @@
 
 #include "yocto_pwm.hpp"
 
+void YoctoFreeAll() {
+    YAPI::FreeAPI();
+}
+
 static void pwmChangeCallbackTest(YPwmInput *fct, const string &value)
 {
     auto n = std::chrono::system_clock::now();
