@@ -142,6 +142,7 @@ int main(int argc, char *argv[]) {
                     "Microplotter Signal detector port: %s\n\n", comPort, baudrate, usbPwmDevice);
     
     // TODO: Check ports, validate equipments
+
     std::cout << "Opening USB port." << std::endl;
     /* Open File Descriptor */
     int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY);
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
     dispenser.StopDispense();
 
 // test pwm
-//    yoctoTest();
+    yoctoTest(usbPwmDevice);
 
 
     signal(SIGINT, system_sig_handler);

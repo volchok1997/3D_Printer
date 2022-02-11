@@ -12,12 +12,12 @@ private:
     YModule     *m;
 public:
     Yocto_PWM();
-    int Detect();
+    int Detect(string target);
     int Test();
     void EnablePWMDetection(YPwmInputValueCallback callback);
     void EnterEventMode();
 };
 
-void yoctoTest();
+void yoctoTest(string dev);
 
 #endif

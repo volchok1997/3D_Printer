@@ -17,32 +17,27 @@ static void pwmChangeCallbackTest(YPwmInput *fct, const string &value)
 
 Yocto_PWM::Yocto_PWM() {
     pwm = NULL;
-    pwm1 = NULL;
-    pwm2 = NULL;
     m = NULL;
 }
 
-int Yocto_PWM::Detect() {
+int Yocto_PWM::Detect(string target) {
     string       errmsg;
-    string       target = "any";
     // Setup the API to use local USB devices
     if (YAPI::RegisterHub("usb", errmsg) != YAPI::SUCCESS) {
         std::cerr << "RegisterHub error: " << errmsg << std::endl;
         return -1;
     }
-
-    pwm = YPwmInput::FirstPwmInput();
+    if(target=="any")
+        pwm = YPwmInput::FirstPwmInput();
+    else
+        pwm = YPwmInput::FindPwmInput(target + ".pwmInput1");
     if(pwm == NULL) {
         std::cerr << "No module connected (Check cable)" << std::endl;
         return -1;
     }
 
-    pwm = YPwmInput::FindPwmInput(target + ".pwmInput1");
-
     if (pwm->isOnline()) {
         m = pwm->get_module();
-        pwm1 = YPwmInput::FindPwmInput(m->get_serialNumber() + ".pwmInput1");
-        pwm2 = YPwmInput::FindPwmInput(m->get_serialNumber() + ".pwmInput2");
     } else {
         std::cerr << "No module connected (Check cable)" << std::endl;
     }
@@ -51,11 +46,9 @@ int Yocto_PWM::Detect() {
 
 int Yocto_PWM::Test() {
     string       errmsg;
-    while (pwm1->isOnline()) {
-        std::cout << "PWM1 : " << pwm1->get_frequency() << " Hz " << pwm1->get_dutyCycle()
-             << " %  " << pwm1->get_pulseCounter() << "pulses edges" << std::endl;
-        std::cout << "PWM2 : " << pwm2->get_frequency() << "  Hz " << pwm2->get_dutyCycle()
-             << " %  " << pwm2->get_pulseCounter() << " pulses edges" << std::endl;
+    while (pwm->isOnline()) {
+        std::cout << "PWM1 : " << pwm->get_frequency() << " Hz " << pwm->get_dutyCycle()
+             << " %  " << pwm->get_pulseCounter() << "pulses edges" << std::endl;
 
         std::cout << "  (press Ctrl-C to exit)" << std::endl;
         YAPI::Sleep(1000, errmsg);
@@ -79,9 +72,10 @@ void Yocto_PWM::EnterEventMode() {
 }
 
 
-void yoctoTest() {
+void yoctoTest(string dev) {
     Yocto_PWM pwm;
-    pwm.Detect();
+    ///pwm.Detect("any");
+    pwm.Detect(dev);
     pwm.EnablePWMDetection(pwmChangeCallbackTest);
     pwm.EnterEventMode();
 }
