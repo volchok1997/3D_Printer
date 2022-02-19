@@ -18,43 +18,21 @@
 
 #include "INIReader.hpp"
 
-//#include "yocto_api.h"
-//#include "yocto_pwminput.h"
-
 #include "ml808gx.hpp"
-#include "yocto_pwm.hpp"
+
 
 // default configuration
 const char* DEFAULT_CONFIG_FILE = "config.ini";
 const char* DEFAULT_LOG_FILE = "workdata.log";
 const char* DEFAULT_ML808GX_SERIAL_PORT = "COM1";
-const char* DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT = "USB10";
+const int DEFAULT_RPI_PWM_READ_PIN = 6;
 const int DEFAULT_COM_BAUDRATE = 115200;
 
 
 static ML808GX dispenser;
-Yocto_PWM pwm;
-
-
-static void pwmChangeCallback(YPwmInput *fct, const string &value) {
-    int err;
-    dispenser.ToggleDispense();
-    auto n = std::chrono::system_clock::now();
-    std::time_t t = std::chrono::system_clock::to_time_t(n);
-
-    if(dispenser.GetDispenserStatus()==0) {
-        err = dispenser.StartDispense();
-        std::cerr << std::ctime(&t) << "Start Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
-    } else {
-        err = dispenser.StopDispense();
-        std::cerr << std::ctime(&t) << "Stop Dispenser, PWM:" << value<<", Err = "<<err<< std::endl;
-    }
-    
-}
 
 
 void system_sig_handler(int s) {
-    YoctoFreeAll();
     exit(s);
 }
 
@@ -68,37 +46,37 @@ int main(int argc, char *argv[]) {
 
     char comPort[256];
     int baudrate;
-    char usbPwmDevice[256];
+    int rpiPwmPin;
 
     // default setup
     sprintf(cfgFile, "%s",DEFAULT_CONFIG_FILE);
     sprintf(logFile, "%s",DEFAULT_LOG_FILE);
 
     sprintf(comPort, "%s", DEFAULT_ML808GX_SERIAL_PORT);
-    sprintf(usbPwmDevice, "%s", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT);
+    rpiPwmPin = DEFAULT_RPI_PWM_READ_PIN;
     baudrate = DEFAULT_COM_BAUDRATE;
     
     // try to load config file to overwrite default value
     INIReader* reader = new INIReader(cfgFile);
     if(reader->ParseError() == 0) {
         sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
-
         sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
         baudrate = reader->GetInteger("ML808GX", "BAUDRATE", DEFAULT_COM_BAUDRATE);
-        sprintf(usbPwmDevice, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "DEVICE", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+        rpiPwmPin = reader->GetInteger("MICROPLOTTER_SIG_DETECTOR", "PIN", DEFAULT_RPI_PWM_READ_PIN);
     }
     delete reader;
 
-    while((opt = getopt(argc, argv, "c:p:u:l:r:")) != -1) {
+    while((opt = getopt(argc, argv, "c:p:i:l:r:")) != -1) {
         switch (opt) {
             case 'c':
                 sprintf(cfgFile, "%s", optarg);
                 reader = new INIReader(cfgFile);
                 if(reader->ParseError() == 0) {
                     sprintf(logFile, "%s", reader->Get("SYSTEM", "LOG", DEFAULT_LOG_FILE).c_str());
-
                     sprintf(comPort, "%s", reader->Get("ML808GX", "PORT", DEFAULT_ML808GX_SERIAL_PORT).c_str());
-                    sprintf(usbPwmDevice, "%s", reader->Get("MICROPLOTTER_SIG_DETECTOR", "PORT", DEFAULT_MICROPLOTTER_SIG_READER_USB_PORT).c_str());
+                    baudrate = reader->GetInteger("ML808GX", "BAUDRATE", DEFAULT_COM_BAUDRATE);
+                    rpiPwmPin = reader->GetInteger("MICROPLOTTER_SIG_DETECTOR", "PIN", DEFAULT_RPI_PWM_READ_PIN);
+                    break;
                 } else {
                     fprintf(stderr, "Config file error, check file existence or format\n");
                     exit(EXIT_FAILURE);
@@ -118,12 +96,12 @@ int main(int argc, char *argv[]) {
                 }
                 sprintf(logFile, "%s", optarg);
                 break;
-            case 'u':
+            case 'i':
                 if(optarg == NULL) {
-                    fprintf(stderr, "USB/Yocto-PWM device format error.\n");
+                    fprintf(stderr, "RPI pin format error\n");
                     exit(EXIT_FAILURE);
                 }
-                sprintf(usbPwmDevice, "%s", optarg);
+                rpiPwmPin = atoi(optarg);
                 break;
             case 'r':
                 if(optarg == NULL) {
@@ -133,14 +111,14 @@ int main(int argc, char *argv[]) {
                 baudrate =atoi(optarg);
                 break;
             default: /* '?' */
-                fprintf(stderr, "Usage: %s [-c CONFIG_FILE] [-p COM_PORT] [-u USB_PORT] [-l LOG_FILE]\n",
+                fprintf(stderr, "Usage: %s [-c CONFIG_FILE] [-p COM_PORT] [-i RPI_pwm_read_pin] [-l LOG_FILE]\n",
                             argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
 
     fprintf(stderr, "ML808GX control port: %s, rate: %d\n"
-                    "Microplotter Signal detector port: %s\n\n", comPort, baudrate, usbPwmDevice);
+                    "Raspberry Signal detector PIN: %d\n\n", comPort, baudrate, rpiPwmPin);
     
     // TODO: Check ports, validate equipments
 
@@ -180,7 +158,7 @@ int main(int argc, char *argv[]) {
     dispenser.StopDispense();
 
 // test pwm
-    yoctoTest(usbPwmDevice);
+    
 
 
     signal(SIGINT, system_sig_handler);
