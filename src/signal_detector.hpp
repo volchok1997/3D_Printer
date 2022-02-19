@@ -1,5 +1,5 @@
-#ifndef __SIGNAL_DECTOR_HPP__
-#define __SIGNAL_DECTOR_HPP__
+#ifndef __SIGNAL_DETECTOR_HPP__
+#define __SIGNAL_DETECTOR_HPP__
 
 
 int signalDectorInitial(int pinX) ;

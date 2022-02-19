@@ -5,7 +5,7 @@
 
 #include <pigpio.h>
 
-#include "signal_dector.hpp"
+#include "signal_detector.hpp"
 #include "ml808gx.hpp"
 
 static int timeout = 1;  // 1ms
