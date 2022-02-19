@@ -1,6 +1,8 @@
 #ifndef __ML808GX_HPP__
 #define __ML808GX_HPP__
 
+#include <string>
+
 class ML808GX {
 private:
     int dispenser_status;               // 1: dispensing, 0: idle    
