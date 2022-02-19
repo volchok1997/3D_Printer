@@ -81,5 +81,4 @@ char buf [100];
 int n = read (fd, buf, sizeof buf);  // read up to 100 characters if ready to read
 */
 
-
 #endif
