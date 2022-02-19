@@ -11,8 +11,8 @@ endif
 
 
 TARGET := dispenserController
-OBJS := main.o ml808gx.o signal_dector.o
-DEPS := INIReader.hpp serial.h ml808gx.hpp signal_dector.hpp
+OBJS := main.o ml808gx.o signal_detector.o
+DEPS := INIReader.hpp serial.h ml808gx.hpp signal_detector.hpp
 LIBS := -lpigpio -lm -lpthread
 CFLAGS += -I. 
 

@@ -19,6 +19,7 @@
 #include "INIReader.hpp"
 
 #include "ml808gx.hpp"
+#include "signal_detector.hpp"
 
 
 // default configuration
@@ -159,6 +160,13 @@ int main(int argc, char *argv[]) {
 
 // test pwm
     
+    int err = signalDectorInitial(rpiPwmPin);
+    fprintf(stderr, "initial RPI input pin %d, result: %d\n", rpiPwmPin, err);
+    if(err<0)
+        exit(1);
+    enableTrigger(rpiPwmPin, 3, &dispenser);
+    sleep(120);
+    cancelTrigger(rpiPwmPin);
 
 
     signal(SIGINT, system_sig_handler);
