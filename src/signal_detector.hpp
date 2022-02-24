@@ -2,7 +2,8 @@
 #define __SIGNAL_DETECTOR_HPP__
 
 
-int signalDectorInitial(int pinX) ;
+int signalDetectorInitial(int pinX) ;
+int sampleWave(int pinX, int timeout, void* dispencer);
 void enableTrigger(int pinX, int t, void* dispenser) ;
 void cancelTrigger(int pinX) ;
 

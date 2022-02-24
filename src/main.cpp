@@ -155,16 +155,16 @@ int main(int argc, char *argv[]) {
     dispenser.ConnectSerial(comPort, baudrate);
     dispenser.VerifyDispenser();
     dispenser.StartDispense();
-    sleep(10);
+    sleep(1);
     dispenser.StopDispense();
 
 // test pwm
     
-    int err = signalDectorInitial(rpiPwmPin);
+    int err = signalDetectorInitial(rpiPwmPin);
     fprintf(stderr, "initial RPI input pin %d, result: %d\n", rpiPwmPin, err);
     if(err<0)
         exit(1);
-    enableTrigger(rpiPwmPin, 3, &dispenser);
+    enableTrigger(rpiPwmPin, 30, &dispenser);
     sleep(120);
     cancelTrigger(rpiPwmPin);
 
