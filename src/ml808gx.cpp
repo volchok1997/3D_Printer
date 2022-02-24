@@ -26,7 +26,7 @@ int ML808GX::ConnectSerial(const char* dev, int baudrate) {
         return com_fd;
     }
 
-    err = set_interface_attribs (com_fd, baudrate, 0);  // set speed to 115,200 bps, 8n1 (no parity)
+    err = set_interface_attribs (com_fd, B(baudrate), 0);  // set speed to 115,200 bps, 8n1 (no parity)
     if(err == -1)
         return err;
     set_blocking (com_fd, 0);
