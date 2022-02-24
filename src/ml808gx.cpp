@@ -45,7 +45,7 @@ int ML808GX::CmdInit() {
     // FIXME: test the delay is OK
     c = 0;
     buf[0] = 0;
-    while(n = read(com_fd, buf, 8) == 0) {
+    while((n = read(com_fd, buf, 8)) == 0) {
 	usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
