@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
                     "Raspberry Signal detector PIN: %d\n\n", comPort, baudrate, rpiPwmPin);
     
     // TODO: Check ports, validate equipments
-
+#if 0
     std::cout << "Opening USB port." << std::endl;
     /* Open File Descriptor */
     int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY);
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     /* Set Baud Rate */
     cfsetospeed (&tty, (speed_t)B19200);
     cfsetispeed (&tty, (speed_t)B19200);
-
+#endif
 
 // test dispenser
     dispenser.ConnectSerial(comPort, baudrate);
