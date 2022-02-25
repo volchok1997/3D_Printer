@@ -122,7 +122,7 @@ int ML808GX::CmdEnd() {
     int n_written = 0;
 
     while((n += read(com_fd, buf+n, 16-n)) <8) {
-	std::cout << "n = " << n << std::hex << ", read char: 0x" << (0xFF & buf[0]) << std::endl;
+	std::cout << "n = " << n << std::hex << ", read char: 0x" << (buf) << std::endl;
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
