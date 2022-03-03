@@ -20,6 +20,7 @@
 
 #include "ml808gx.hpp"
 #include "signal_detector.hpp"
+#include "gpio_direct_register_access.hpp"
 
 
 // default configuration
@@ -159,7 +160,7 @@ int main(int argc, char *argv[]) {
     dispenser.StopDispense();
 
 // test pwm
-    
+
     int err = signalDetectorInitial(rpiPwmPin);
     fprintf(stderr, "initial RPI input pin %d, result: %d\n", rpiPwmPin, err);
     if(err<0)

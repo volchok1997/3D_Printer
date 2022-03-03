@@ -69,12 +69,10 @@ int ML808GX::CmdEndWithData(char data[], int size) {
     int data_size = 3;
     while((n += read(com_fd, buf+n, 64-n)) < 8) {
         usleep (COMM_DELAY); 
-	std::cout << "n = " << n << std::hex << ", read char: 0x" << (0xFF & buf[0]) << std::endl;
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)
             break;
     }
-    std::cout<<"DEBUG:"<<buf<<std::endl;
     buf[n] = 0;
     n=0;
     std::string reply(buf);
@@ -122,7 +120,6 @@ int ML808GX::CmdEnd() {
     int n_written = 0;
 
     while((n += read(com_fd, buf+n, 16-n)) <8) {
-	std::cout << "n = " << n << std::hex << ", read char: 0x" << (buf) << std::endl;
         usleep (COMM_DELAY); 
         c+= COMM_DELAY;
         if(c>ACK_WAIT_US)

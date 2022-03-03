@@ -59,6 +59,11 @@ int sampleWave(int pinX, int t, void* user){
     int max=0;
     unsigned timeout=150;
 
+    setup_io();
+
+    INP_GPIO(21); // must use INP_GPIO before we can use OUT_GPIO
+    OUT_GPIO(21);
+    
     while(1) {
         int pin = gpioRead(pinX);
         auto tick = gpioTick();
@@ -68,7 +73,7 @@ int sampleWave(int pinX, int t, void* user){
 	if(pinState == pin) {
 	    if(pin == 1)
 		start = tick;
-	    gpioDelay(2);
+	    gpioDelay(1);
 	    continue;
 	}
     
@@ -76,6 +81,7 @@ int sampleWave(int pinX, int t, void* user){
 	if(pin == 1) {
 	    start = tick;
 	    if(pinState == 0) {
+		GPIO_SET = 1<<21;
 	        fprintf(stderr, "start printing\n");
 	        pinState = pin;
 	    }
@@ -83,12 +89,13 @@ int sampleWave(int pinX, int t, void* user){
 	}else {
 	    end = tick;
 	    if(timeout < end-start){
+		GPIO_CLR = 1<<21;
 	        fprintf(stderr, "range detected : %d us\n", end-start);
 	        max = end-start;
 	        pinState = pin;
 	    }
 	}
-	gpioDelay(2);
+	gpioDelay(1);
     }
 
     return 0;
