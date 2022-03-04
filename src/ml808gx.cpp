@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <string>
-//using std::string;
 
 #include "ml808gx.hpp"
 
@@ -26,7 +25,7 @@ int ML808GX::ConnectSerial(const char* dev, int baudrate) {
         return com_fd;
     }
 
-    err = set_interface_attribs (com_fd, B(baudrate), 0);  // set speed to 115,200 bps, 8n1 (no parity)
+    err = set_interface_attribs (com_fd, B(baudrate), 0);  // set speed to B(115,200) bps, 8n1 (no parity)
     if(err == -1)
         return err;
     set_blocking (com_fd, 0);
@@ -129,7 +128,7 @@ int ML808GX::CmdEnd() {
     std::string reply(buf);
     if(reply == A0) {
         // send EOT
-        fprintf(stderr, "Received A0, Done\n");
+        //fprintf(stderr, "Received A0, Done\n");
         n_written = write(com_fd, EOT.c_str(), EOT.size());
         usleep(ACK_WAIT_US);
         return 0;
@@ -171,7 +170,7 @@ int ML808GX::VerifyDispenser() {
 int ML808GX::ToggleDispense() {
     int err;
     // Prepare send
-    fprintf(stderr, "ToggleDispense ...\n");
+    //fprintf(stderr, "ToggleDispense ...\n");
     err = CmdInit();
     if(err<0) {
         fprintf(stderr, "Cmd ACK error..\n");
@@ -182,7 +181,7 @@ int ML808GX::ToggleDispense() {
 
     err = CmdEnd();
     if(err==0) {
-        fprintf(stderr, "Toggle dispense Done\n");
+        //fprintf(stderr, "Toggle dispense Done\n");
     } else {
         fprintf(stderr, "Toggle dispense Error\n");
     }
