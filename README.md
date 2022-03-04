@@ -1,8 +1,8 @@
 # 3D Printer
-Integrate Sonoplot Microplotter II stage with Musashi dispenser
 
 Introduction
 ------------
+This project is intended for use with the Stony Brook University's 3D printer in the Light Engineering building. It is designed to work with the hardware in Dr. Shanshan Yao's research lab. The purpose of this project is to integrate a dispenser with a 3D printing stage to expand its material compatibilities.  
 
 Environment
 -----------
