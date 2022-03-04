@@ -30,8 +30,10 @@ Update serial port config, PWM input pin at config.ini
 
 Control Latency
 ---------------
-
-
+|       | 19200 | 38400 |
+|-------|-------|-------|
+| Start | 18ms  | 13ms  |
+| Stop  | 14ms  | 8ms   |
 
 
 
