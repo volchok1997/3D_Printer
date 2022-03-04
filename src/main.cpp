@@ -128,7 +128,10 @@ int main(int argc, char *argv[]) {
 
     // Verify dispenser
     dispenser.ConnectSerial(comPort, baudrate);
-    dispenser.VerifyDispenser();
+    if(dispenser.VerifyDispenser()!=0) {
+        fprintf(stderr, "Dispenser not found. Check: RS232 connection, baudrate\n");
+        exit(-1);
+    }
 
     signal(SIGINT, system_sig_handler);
 
