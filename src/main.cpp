@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, system_sig_handler);
 
     // main signal tracking loop
-    trackingWave(rpiPwmPin, 150, &dispenser);  // 150 us
+    trackWave(rpiPwmPin, 150, &dispenser);  // 150 us
 
 
     exit(EXIT_SUCCESS);
