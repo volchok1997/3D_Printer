@@ -1,7 +1,7 @@
 
 UNAME_S := $(shell uname -s)
 ARCH  := $(shell uname -m| sed -e s/i.86/i386/ -e s/arm.*/arm/)
-CFLAG := -O2
+CFLAGS := -O2
 
 ifeq ($(UNAME_S),Linux)
 	CC := g++
