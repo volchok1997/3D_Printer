@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+//using std::string;
 
 #include "ml808gx.hpp"
 
@@ -25,7 +26,7 @@ int ML808GX::ConnectSerial(const char* dev, int baudrate) {
         return com_fd;
     }
 
-    err = set_interface_attribs (com_fd, B(baudrate), 0);  // set speed to B(115,200) bps, 8n1 (no parity)
+    err = set_interface_attribs (com_fd, B(baudrate), 0);  // set speed to 115,200 bps, 8n1 (no parity)
     if(err == -1)
         return err;
     set_blocking (com_fd, 0);
@@ -128,7 +129,7 @@ int ML808GX::CmdEnd() {
     std::string reply(buf);
     if(reply == A0) {
         // send EOT
-        //fprintf(stderr, "Received A0, Done\n");
+        fprintf(stderr, "Received A0, Done\n");
         n_written = write(com_fd, EOT.c_str(), EOT.size());
         usleep(ACK_WAIT_US);
         return 0;
@@ -145,7 +146,6 @@ int ML808GX::CmdEnd() {
 
 int ML808GX::VerifyDispenser() {
     int err;
-    ssize_t size;
     char buf[64] = {};
     if(com_fd<0)
         return com_fd;      // com not connected
@@ -157,34 +157,32 @@ int ML808GX::VerifyDispenser() {
         return err;
     }
     // Send command
-    size = write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
+    write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
 
     int sz = CmdEndWithData(buf, sizeof(buf));
     if(sz>0) {
         fprintf(stderr, "Got ROM version: %s\n", buf);
-        return 0;
     } else {
         fprintf(stderr, "Read ROM version error\n");
-        return -1;
     }
+    return 0;
 }
 
 int ML808GX::ToggleDispense() {
     int err;
-    ssize_t size;
-    //fprintf(stderr, "ToggleDispense ...\n");
     // Prepare send
+    fprintf(stderr, "ToggleDispense ...\n");
     err = CmdInit();
     if(err<0) {
         fprintf(stderr, "Cmd ACK error..\n");
         return err;
     }
     // Send command
-    size = write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
+    write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
 
     err = CmdEnd();
     if(err==0) {
-        //fprintf(stderr, "Toggle dispense Done\n");
+        fprintf(stderr, "Toggle dispense Done\n");
     } else {
         fprintf(stderr, "Toggle dispense Error\n");
     }
