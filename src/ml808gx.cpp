@@ -161,16 +161,17 @@ int ML808GX::VerifyDispenser() {
     int sz = CmdEndWithData(buf, sizeof(buf));
     if(sz>0) {
         fprintf(stderr, "Got ROM version: %s\n", buf);
+        return 0;
     } else {
         fprintf(stderr, "Read ROM version error\n");
+        return -1;
     }
-    return 0;
 }
 
 int ML808GX::ToggleDispense() {
     int err;
-    // Prepare send
     //fprintf(stderr, "ToggleDispense ...\n");
+    // Prepare send
     err = CmdInit();
     if(err<0) {
         fprintf(stderr, "Cmd ACK error..\n");
