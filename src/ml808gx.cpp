@@ -145,6 +145,7 @@ int ML808GX::CmdEnd() {
 
 int ML808GX::VerifyDispenser() {
     int err;
+    ssize_t size;
     char buf[64] = {};
     if(com_fd<0)
         return com_fd;      // com not connected
@@ -156,7 +157,7 @@ int ML808GX::VerifyDispenser() {
         return err;
     }
     // Send command
-    write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
+    size = write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
 
     int sz = CmdEndWithData(buf, sizeof(buf));
     if(sz>0) {
@@ -170,6 +171,7 @@ int ML808GX::VerifyDispenser() {
 
 int ML808GX::ToggleDispense() {
     int err;
+    ssize_t size;
     //fprintf(stderr, "ToggleDispense ...\n");
     // Prepare send
     err = CmdInit();
@@ -178,7 +180,7 @@ int ML808GX::ToggleDispense() {
         return err;
     }
     // Send command
-    write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
+    size = write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
 
     err = CmdEnd();
     if(err==0) {
