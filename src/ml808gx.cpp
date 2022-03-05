@@ -53,7 +53,7 @@ int ML808GX::CmdInit() {
     }
 
     if(buf[0] == ACK.c_str()[0]) {
-        fprintf(stderr, "ACK received in %d us\n", c);
+        // fprintf(stderr, "ACK received in %d us\n", c);
         return 0;
     } else {
         fprintf(stderr, "ACK timeout in %d us\n", ACK_WAIT_US);
@@ -128,7 +128,7 @@ int ML808GX::CmdEnd() {
     std::string reply(buf);
     if(reply == A0) {
         // send EOT
-        fprintf(stderr, "Received A0, Done\n");
+        //fprintf(stderr, "Received A0, Done\n");
         n_written = write(com_fd, EOT.c_str(), EOT.size());
         return 0;
     } else if(reply == A2) {
@@ -182,10 +182,11 @@ int ML808GX::ToggleDispense() {
     err = CmdEnd();
     if(err==0) {
         fprintf(stderr, "Toggle dispense Done\n");
+        return 0;
     } else {
         fprintf(stderr, "Toggle dispense Error\n");
+        return err;
     }
-    return err;
 }
 
 int ML808GX::StartDispense() {
