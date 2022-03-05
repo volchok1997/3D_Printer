@@ -16,12 +16,12 @@ volatile unsigned *gpio;
 //
 // Set up a memory regions to access GPIO
 //
-void setup_io()
+int setup_io()
 {
    /* open /dev/mem */
    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
       printf("can't open /dev/mem \n");
-      exit(-1);
+      return -1;
    }
 
    /* mmap GPIO */
@@ -38,13 +38,13 @@ void setup_io()
 
    if (gpio_map == MAP_FAILED) {
       printf("mmap error %p\n", gpio_map);//errno also set!
-      exit(-1);
+      return -1;
    }
 
    // Always use volatile pointer!
    gpio = (volatile unsigned *)gpio_map;
 
-
+   return 0;
 } // setup_io
 
 
