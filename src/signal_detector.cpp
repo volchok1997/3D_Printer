@@ -47,7 +47,7 @@ int trackWave(int gpioX, int t, void* user){
     unsigned long debounce=t;
     unsigned long start;
     unsigned long end;
-    int max=0;
+    unsigned long max=0;
 
     auto timeStart= std::chrono::system_clock::now();
     auto timeEnd  = std::chrono::system_clock::now();
