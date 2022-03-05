@@ -170,7 +170,7 @@ int ML808GX::ToggleDispense() {
     int err;
     ssize_t size;
     // Prepare send
-    fprintf(stderr, "ToggleDispense ...\n");
+    //fprintf(stderr, "ToggleDispense ...\n");
     err = CmdInit();
     if(err<0) {
         fprintf(stderr, "Cmd ACK error..\n");
@@ -181,7 +181,7 @@ int ML808GX::ToggleDispense() {
 
     err = CmdEnd();
     if(err==0) {
-        fprintf(stderr, "Toggle dispense Done\n");
+        //fprintf(stderr, "Toggle dispense Done\n");
         return 0;
     } else {
         fprintf(stderr, "Toggle dispense Error\n");
