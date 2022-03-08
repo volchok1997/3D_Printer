@@ -3,8 +3,6 @@
 
 
 int signalDetectorInitial(int pinX) ;
-int sampleWave(int pinX, int timeout, void* dispencer);
-void enableTrigger(int pinX, int t, void* dispenser) ;
-void cancelTrigger(int pinX) ;
+int trackWave(int pinX, int timeout, void* dispencer);
 
 #endif

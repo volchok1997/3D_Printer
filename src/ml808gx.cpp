@@ -53,7 +53,7 @@ int ML808GX::CmdInit() {
     }
 
     if(buf[0] == ACK.c_str()[0]) {
-        fprintf(stderr, "ACK received in %d us\n", c);
+        // fprintf(stderr, "ACK received in %d us\n", c);
         return 0;
     } else {
         fprintf(stderr, "ACK timeout in %d us\n", ACK_WAIT_US);
@@ -105,7 +105,6 @@ int ML808GX::CmdEndWithData(char data[], int size) {
     } else if(reply == A2) {
         fprintf(stderr, "Received A2, message failed\n");
         n_written = write(com_fd, CAN.c_str(), CAN.size());
-        usleep(ACK_WAIT_US);
         return -1;
     } else {
         fprintf(stderr, "CmdEndWithData error, DEBUG info: size%d, %s\n", n, buf);
@@ -129,14 +128,12 @@ int ML808GX::CmdEnd() {
     std::string reply(buf);
     if(reply == A0) {
         // send EOT
-        fprintf(stderr, "Received A0, Done\n");
+        //fprintf(stderr, "Received A0, Done\n");
         n_written = write(com_fd, EOT.c_str(), EOT.size());
-        usleep(ACK_WAIT_US);
         return 0;
     } else if(reply == A2) {
         fprintf(stderr, "Received A2, message failed\n");
         n_written = write(com_fd, CAN.c_str(), CAN.size());
-        usleep(ACK_WAIT_US);
         return -1;
     } else {
         fprintf(stderr, "CmdEnd error, DEBUG info: size%d, %s\n", n, buf);
@@ -146,6 +143,7 @@ int ML808GX::CmdEnd() {
 
 int ML808GX::VerifyDispenser() {
     int err;
+    ssize_t size;
     char buf[64] = {};
     if(com_fd<0)
         return com_fd;      // com not connected
@@ -157,7 +155,7 @@ int ML808GX::VerifyDispenser() {
         return err;
     }
     // Send command
-    write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
+    size = write (com_fd, CMD_F_RM.c_str(), CMD_F_RM.size());           // send RM command
 
     int sz = CmdEndWithData(buf, sizeof(buf));
     if(sz>0) {
@@ -170,23 +168,25 @@ int ML808GX::VerifyDispenser() {
 
 int ML808GX::ToggleDispense() {
     int err;
+    ssize_t size;
     // Prepare send
-    fprintf(stderr, "ToggleDispense ...\n");
+    //fprintf(stderr, "ToggleDispense ...\n");
     err = CmdInit();
     if(err<0) {
         fprintf(stderr, "Cmd ACK error..\n");
         return err;
     }
     // Send command
-    write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
+    size = write (com_fd, CMD_F_DI.c_str(), CMD_F_DI.size());           // send RM command
 
     err = CmdEnd();
     if(err==0) {
-        fprintf(stderr, "Toggle dispense Done\n");
+        //fprintf(stderr, "Toggle dispense Done\n");
+        return 0;
     } else {
         fprintf(stderr, "Toggle dispense Error\n");
+        return err;
     }
-    return err;
 }
 
 int ML808GX::StartDispense() {

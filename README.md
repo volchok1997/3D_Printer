@@ -1,44 +1,40 @@
-# 3D_Printer
-Integrate Sonoplot Microplotter II stage with Musashi dispenser
+# 3D Printer
 
-## Environment setup
+Introduction
+------------
+This project is intended for use with the Stony Brook University's 3D printer in the Light Engineering building. It is designed to work with the hardware in Dr. Shanshan Yao's research lab. The purpose of this project is to integrate a dispenser with a 3D printing stage to expand its material compatibilities.  
+
+Environment
+-----------
+* Sonoplot Microplotter II
+* Musashi ML808GX
+* Raspberry Pi 4b
+
+Build
+-----
 ``` 
-git clone https://github.com/renaissanxe/3D_Printer.git
-cd 3D_Printer
-git submodule init
-git submodule update
+$ git clone https://github.com/renaissanxe/3D_Printer.git
+$ cd 3D_Printer
+$ git submodule init
+$ git submodule update
+$ cd src
+$ make
 ```
 
-### Work in WSL2
-USB device has to be mapped from windows to WSL.  
-Get windows package usbipd at Powershell (https://github.com/dorssel/usbipd-win)  
+Usage
+---
+Update serial port config, PWM input pin at config.ini
 ```
-winget install --interactive --exact dorssel.usbipd-win
-```
-Get hwdata at WSL2 
-```
-sudo apt install linux-tools-5.4.0-77-generic hwdata
-```
-Get usbid on host machine:
-```
-usbipd wsl list
-```
-Attach usb device to wsl
-```
-usbipd wsl attach --busid <busid>
-```
-Opne WSL 2 instance and run lsusb:
-```
-lsusb
-```
-After finished, detach on wsl
-```
-usbipd wsl detach --busid <busid>
+# ./dispenserController
 ```
 
-## Compile
-under ./src, run 
-```
-make
-```
+Control Latency
+---------------
+|       | 19200 | 38400 |
+|-------|-------|-------|
+| Start | 18ms  | 13ms  |
+| Stop  | 14ms  | 8ms   |
+
+
+
 

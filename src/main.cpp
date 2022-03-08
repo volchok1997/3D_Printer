@@ -31,16 +31,11 @@ const int DEFAULT_RPI_PWM_READ_PIN = 6;
 const int DEFAULT_COM_BAUDRATE = 115200;
 
 
-static ML808GX dispenser;
-
-
 void system_sig_handler(int s) {
     exit(s);
 }
 
 int main(int argc, char *argv[]) {
-    
-    
     int flags, opt;
 
     char logFile[256];
@@ -49,6 +44,8 @@ int main(int argc, char *argv[]) {
     char comPort[256];
     int baudrate;
     int rpiPwmPin;
+
+    ML808GX dispenser;
 
     // default setup
     sprintf(cfgFile, "%s",DEFAULT_CONFIG_FILE);
@@ -122,65 +119,25 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "ML808GX control port: %s, rate: %d\n"
                     "Raspberry Signal detector PIN: %d\n\n", comPort, baudrate, rpiPwmPin);
     
-    // TODO: Check ports, validate equipments
-#if 0
-    std::cout << "Opening USB port." << std::endl;
-    /* Open File Descriptor */
-    int USB = open( "/dev/ttyUSB0", O_RDWR| O_NOCTTY);
+    fprintf(stderr, "Please verify: Sonoplot Dispenser frequency=200KHz, Voltage=10V\n");
     
-    //Open USB error handiling
-    if (USB < 0) {
-	std::cout << "Error while opening device... " << "errno = " << errno << std::endl;
-        perror("Something went wrong with open()");
-        exit(1);
-    }
-    
-    struct termios tty;
-    struct termios tty_old;
-    memset (&tty, 0, sizeof tty);
-
-    /* Error Handling */
-    if ( tcgetattr ( USB, &tty ) != 0 ) {
-    std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
-    }
-
-    /* Save old tty parameters */
-    tty_old = tty;
-
-    /* Set Baud Rate */
-    cfsetospeed (&tty, (speed_t)B19200);
-    cfsetispeed (&tty, (speed_t)B19200);
-#endif
-
-// test dispenser
-    dispenser.ConnectSerial(comPort, baudrate);
-    dispenser.VerifyDispenser();
-    dispenser.StartDispense();
-    sleep(1);
-    dispenser.StopDispense();
-
-// test pwm
-
     int err = signalDetectorInitial(rpiPwmPin);
     fprintf(stderr, "initial RPI input pin %d, result: %d\n", rpiPwmPin, err);
     if(err<0)
         exit(1);
-    enableTrigger(rpiPwmPin, 30, &dispenser);
-    sleep(120);
-    cancelTrigger(rpiPwmPin);
 
+    // Verify dispenser
+    dispenser.ConnectSerial(comPort, baudrate);
+    if(dispenser.VerifyDispenser()!=0) {
+        fprintf(stderr, "Dispenser not found. Check: RS232 connection, baudrate\n");
+        exit(-1);
+    }
 
     signal(SIGINT, system_sig_handler);
 
-    // TODO: tracking signal changes and control the dispenser
-    //while(1) {
+    // main signal tracking loop
+    trackWave(rpiPwmPin, 150, &dispenser);  // 150 us
 
-    //}
-
-// Don't touch this 
-    //pwm.Detect();
-    //pwm.EnablePWMDetection(pwmChangeCallback);
-    //pwm.EnterEventMode();
 
     exit(EXIT_SUCCESS);
 }
