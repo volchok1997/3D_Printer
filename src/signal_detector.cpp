@@ -48,7 +48,6 @@ int trackWave(int gpioX, int t, void* user){
     unsigned long start;
     unsigned long end;
     unsigned long max=0;
-    unsigned int upperLimit = 1000; //Set upper limit to 1 ms
 
     auto timeStart= std::chrono::system_clock::now();
     auto timeEnd  = std::chrono::system_clock::now();
@@ -69,7 +68,8 @@ int trackWave(int gpioX, int t, void* user){
             start = tick;
             if(pinState == 0) {
                 dispenser->StartDispense();
-                GPIO_SET(DBG_GPIO);
+                start = sysTick();
+		GPIO_SET(DBG_GPIO);
                 timeStart= std::chrono::system_clock::now();
                 currTime = std::chrono::system_clock::to_time_t(timeStart);
                 fprintf(stderr, "%s : Start dispenser\n", std::ctime(&currTime));
@@ -78,7 +78,7 @@ int trackWave(int gpioX, int t, void* user){
                                 
         } else {  //if LOW then check the timeout
             end = tick;
-            if(debounce < end-start && upperLimit > end-start){ 
+            if(debounce < end-start){  
                 dispenser->StopDispense();
                 GPIO_CLR(DBG_GPIO);
                 timeEnd= std::chrono::system_clock::now();
