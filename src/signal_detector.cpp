@@ -16,19 +16,6 @@
 
 const int DBG_GPIO=21;
 
-void sysDelay(long micros) {
-    struct timespec ts, rem;
-
-    ts.tv_sec  = micros/1000000;
-    ts.tv_nsec = micros%1000000*1000;
-
-    while (clock_nanosleep(CLOCK_REALTIME, 0, &ts, &rem))
-    {
-        ts.tv_sec  = rem.tv_sec;
-        ts.tv_nsec = rem.tv_nsec;
-    }
-}
-
 unsigned long sysTick() {
     struct timeval tv;
     gettimeofday(&tv,NULL);
