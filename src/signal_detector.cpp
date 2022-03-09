@@ -89,7 +89,7 @@ int trackWave(int gpioX, int t, void* user){
             }
         }
         //gpioDelay(1);
-        usleep(1);
+        //usleep(1);
     }
 
     return 0;
